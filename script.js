@@ -1,41 +1,23 @@
-// Online avatar upload functionality
+// Script for handling avatar click and image upload
 
-function uploadAvatar(file) {
-    const formData = new FormData();
-    formData.append('avatar', file);
+document.addEventListener('DOMContentLoaded', function () {
+    const avatar = document.getElementById('avatar');
+    const fileInput = document.getElementById('avatarUpload');
 
-    fetch('/api/upload-avatar', {
-        method: 'POST',
-        body: formData,
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            console.log('Avatar uploaded successfully!');
-            loadAvatar(); // Call function to load avatar
-        } else {
-            console.error('Upload failed:', data.message);
+    // Handle avatar click to trigger file input
+    avatar.addEventListener('click', function () {
+        fileInput.click();
+    });
+
+    // Handle file upload
+    fileInput.addEventListener('change', function (event) {
+        const file = event.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                avatar.src = e.target.result; // Update avatar image
+            };
+            reader.readAsDataURL(file);
         }
-    })
-    .catch(error => console.error('Error uploading avatar:', error));
-}
-
-function loadAvatar() {
-    fetch('/api/get-avatar')
-        .then(response => response.json())
-        .then(data => {
-            if (data.avatarUrl) {
-                const avatarImg = document.getElementById('avatar');
-                avatarImg.src = data.avatarUrl;
-            }
-        })
-        .catch(error => console.error('Error loading avatar:', error));
-}
-
-// Example usage: Assuming there's an input element to select a file
-document.getElementById('avatarInput').addEventListener('change', function(event) {
-    const file = event.target.files[0];
-    if (file) {
-        uploadAvatar(file);
-    }
+    });
 });
